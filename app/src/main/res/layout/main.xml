@@ -9,8 +9,9 @@
         android:id="@+id/id_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="70dp"
         android:layout_alignParentTop="true"
-        android:scaleType="fitCenter" />
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:id="@+id/id_tools"

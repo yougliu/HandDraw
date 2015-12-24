@@ -1,38 +1,52 @@
 package com.example.helios.handdraw;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.helios.handdraw.utils.FileUtils;
+
+import java.io.File;
 
 public class MainActivity extends BaseMainActivity implements View.OnClickListener{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = "HandDraw";
     private static final int REQUEST_CODE_TAKE_PHOTO = 0x01;
-    private static final int REQUEST_CODE_GET_PHOTOT = 0x02;
+    private static final int REQUEST_CODE_GET_PHOTO = 0x02;
+    private static final int REQUEST_CODE_CLIP_PHOTO = 0x03;
     private PopupWindow mPopup;
     private RelativeLayout mFabLayout;
     private LinearLayout mToolLayout;
     private ViewPager mViewpager;
     private LinearLayout mViewpagerLayout;
     private boolean mPopStatus,mfabStatus,mToolStatus,mViewpagerStatus;
+    private String mPicPath;
+    private ImageView mImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+//        new BaseApplication().addActivity(this);
+        mPicPath = FileUtils.getPath(this,"cam_pic")+"HandDraw.jpg";
         getToolbarHelper().showAsUpEnable(false);
         getToolbarHelper().getTitle().setText("HandDraw");
         initView();
@@ -60,6 +74,7 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
         mToolLayout = (LinearLayout) findViewById(R.id.id_tools);
         mViewpagerLayout = (LinearLayout) findViewById(R.id.viewPager_layout);
         mViewpager = (ViewPager) findViewById(R.id.id_viewpager);
+        mImageView = (ImageView) findViewById(R.id.id_image);
     }
 
     private void updateStataus(boolean popStatus, boolean fabStatus, boolean toolStatus, boolean viewpagerStatus){
@@ -122,12 +137,79 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != RESULT_OK){
+        Log.d(TAG,"resultcode = "+resultCode + ", "+Activity.RESULT_OK + ", "+RESULT_CANCELED);
+        if(resultCode != Activity.RESULT_OK){
             return ;
         }
         if(requestCode == REQUEST_CODE_TAKE_PHOTO){
-            Toast.makeText(this,data.getData().toString(),Toast.LENGTH_SHORT).show();
+            if(mPicPath != null){
+                clipPhoto(mPicPath);
+            }
+        }else if(requestCode == REQUEST_CODE_CLIP_PHOTO){
+            Log.d(TAG,"request cod clip photo");
+            //获得剪切后的图片
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(mPicPath,options);
+            if(bitmap == null){
+                Log.d(TAG,"get clip photo is null");
+            }else{
+                mImageView.setImageBitmap(bitmap);
+            }
+        }else if(REQUEST_CODE_GET_PHOTO == requestCode){
+            if(data == null){
+                return ;
+            }
+            Uri selectedImage = data.getData();
+            String selectPath = null;
+            if(selectedImage == null){
+                return ;
+            }
+//            try{
+                Log.d(TAG,"select path uri = "+selectedImage.toString());
+                if (selectedImage.toString().startsWith("file://")) {
+                    selectPath = selectedImage.toString().replace("file://", "");
+                } else {
+                    selectPath = FileUtils.getPath(this, selectedImage);
+                }
+                if(selectPath != null){
+                    clipPhoto(selectPath);
+                }
+//            }catch(Exception e){
+//                throw new RuntimeException("query select photo failed !");
+//            }
         }
+    }
+
+    /**
+     * 图片剪切
+     * @param path
+     */
+    private void clipPhoto(String path) {
+        String newPath = null;
+
+        if (path.contains("%")) {
+            try {
+                newPath = FileUtils.DecodeURL(path);
+            } catch (Exception e) {
+                newPath = null;
+            }
+            if (newPath != null) {
+                path = newPath;
+            }
+        }
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(Uri.fromFile(new File(path)),"image/*");
+        intent.putExtra("crop", "true");
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("outputX", 1000);
+        intent.putExtra("outputY", 1000);
+        intent.putExtra("scale", true);
+        intent.putExtra("scaleUpIfNeeded", true);
+        intent.putExtra("return-data", false);
+        intent.putExtra("output", Uri.fromFile(new File(mPicPath)));
+        startActivityForResult(intent,REQUEST_CODE_CLIP_PHOTO);
     }
 
     @Override
@@ -136,12 +218,18 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
         switch (id){
             case R.id.tv_take:
                 Intent camIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
+                mPicPath = FileUtils.getPath(MainActivity.this,"cam_pic") +
+                        System.currentTimeMillis() +".jpg";
+                File photo = new File(mPicPath);
+                camIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+                startActivityForResult(camIntent,REQUEST_CODE_TAKE_PHOTO);
+                updateStataus(false,true,false,false);
                 break;
             case R.id.tv_choice:
-                Intent takePhotoIntent = new Intent(Intent.ACTION_PICK);
-                takePhotoIntent.setType("image/*");
-                startActivityForResult(takePhotoIntent,REQUEST_CODE_TAKE_PHOTO);
+                Intent choiceIntent = new Intent(Intent.ACTION_GET_CONTENT,null);
+                choiceIntent.setType("image/*");
+                startActivityForResult(Intent.createChooser(choiceIntent,"select photo"),REQUEST_CODE_GET_PHOTO);
+                updateStataus(false,true,false,false);
                 break;
             case R.id.tv_cancel:
                 updateStataus(false,true,false,false);
