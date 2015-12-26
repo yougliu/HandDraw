@@ -21,8 +21,13 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.helios.handdraw.adapter.BottomPagerAdapter;
 import com.example.helios.handdraw.utils.FileUtils;
+import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.view.annotation.ViewInject;
+import com.lidroid.xutils.view.annotation.event.OnClick;
 
 import java.io.File;
 
@@ -40,11 +45,25 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
     private boolean mPopStatus,mfabStatus,mToolStatus,mViewpagerStatus;
     private String mPicPath;
     private ImageView mImageView;
+    @ViewInject(R.id.id_watermaker)
+    private TextView waterMaker;
+    @ViewInject(R.id.id_blackwhite)
+    private TextView blackWhite;
+    @ViewInject(R.id.id_clipper)
+    private TextView clip;
+    @ViewInject(R.id.id_more)
+    private TextView more;
+    @ViewInject(R.id.viewPager_layout1)
+    private LinearLayout mViewpagerLayout1;
+    @ViewInject(R.id.id_viewpager1)
+    private ViewPager mViewpager1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        //add inject
+        ViewUtils.inject(this);
 //        new BaseApplication().addActivity(this);
         mPicPath = FileUtils.getPath(this,"cam_pic")+"HandDraw.jpg";
         getToolbarHelper().showAsUpEnable(false);
@@ -54,7 +73,7 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                updateStataus(false,false,true,false);
             }
         });
 
@@ -234,6 +253,26 @@ public class MainActivity extends BaseMainActivity implements View.OnClickListen
             case R.id.tv_cancel:
                 updateStataus(false,true,false,false);
                 break;
+
         }
+    }
+    @OnClick({R.id.id_more,R.id.id_clipper,R.id.id_watermaker,R.id.id_blackwhite})
+    public void testButtonClick(View view){
+        int id = view.getId();
+        switch (id){
+            case R.id.id_watermaker:
+                Toast.makeText(MainActivity.this,"watermark",Toast.LENGTH_SHORT).show();
+                updateStataus(false,false,false,true);
+                BottomPagerAdapter adapter = new BottomPagerAdapter(MainActivity.this);
+                mViewpager.setAdapter(adapter);
+                break;
+            case R.id.id_blackwhite:
+                break;
+            case R.id.id_clipper:
+                break;
+            case R.id.id_more:
+                break;
+        }
+
     }
 }

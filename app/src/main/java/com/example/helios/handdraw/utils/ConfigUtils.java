@@ -6,6 +6,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
+import com.example.helios.handdraw.contants.Contants;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * for common util
  * Created by helios on 12/22/15.
@@ -63,6 +68,19 @@ public class ConfigUtils {
     public static String getIMEI(Context context){
         TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         return manager.getDeviceId();
+    }
+
+    public static List<int[]> getWatermarkList(){
+        List<int[]> list = new ArrayList<>();
+        list.add(Contants.water_affection);
+        list.add(Contants.water_food);
+        list.add(Contants.water_popular);
+        list.add(Contants.water_travel);
+        list.add(Contants.water_affection_bg);
+        list.add(Contants.water_food_bg);
+        list.add(Contants.water_popular_bg);
+        list.add(Contants.water_travel_bg);
+        return list;
     }
 
 

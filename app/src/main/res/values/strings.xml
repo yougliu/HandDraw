@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">HandDraw</string>
     <string name="action_settings">Settings</string>
+    <string name="affection">affection</string>
+    <string name="affection_bg">affection_bg</string>
+    <string name="food">food</string>
+    <string name="food_bg">food_bg</string>
+    <string name="popular">popular</string>
+    <string name="popular_bg">popular_bg</string>
+    <string name="travel">travel</string>
+    <string name="travel_bg">travel_bg</string>
 </resources>

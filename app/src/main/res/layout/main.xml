@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#8B7D6B"
     android:id="@+id/main"
     >
 
@@ -18,7 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/transparent"
         android:visibility="gone"
         android:orientation="horizontal">
 
@@ -105,8 +105,25 @@
         >
         <android.support.v4.view.ViewPager
             android:id="@+id/id_viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height= "100dp"
+            android:layout_gravity="center_vertical">
+
+        </android.support.v4.view.ViewPager>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/viewPager_layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        >
+        <android.support.v4.view.ViewPager
+            android:id="@+id/id_viewpager1"
+            android:layout_width="wrap_content"
+            android:layout_height= "100dp"
             android:layout_gravity="center_vertical">
 
         </android.support.v4.view.ViewPager>

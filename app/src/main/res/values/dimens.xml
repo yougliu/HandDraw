@@ -8,4 +8,6 @@
     <dimen name="dialog_item_height">30dp</dimen>
     <dimen name="dialog_item_margintop">5dp</dimen>
     <dimen name="dialog_item_marginbottom">5dp</dimen>
+    <dimen name="bottom_pager_item_margin">5dp</dimen>
+    <dimen name="bottom_pager_item_padding">2dp</dimen>
 </resources>
